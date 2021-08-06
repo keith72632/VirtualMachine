@@ -15,7 +15,7 @@ int sp = -1;
 int stack[STACK_SIZE];
 int registers[NUM_OF_REGISTERS];
 
-const int program[] = {
+const char program[] = {
     PSH, 5,
     PSH, 6,
     ADD,
@@ -36,7 +36,18 @@ int main(int argc, char **argv)
     {
         memcpy(file_name, argv[1], FILE_SIZE);
         puts(file_name);
+        
+        FILE *fp = NULL;
+        int s;
+        fp = fopen(file_name, "r");
+
+        if(fp == NULL)printf("can't open file");
+
+        while((s = fgetc(fp)) != EOF) putchar(s);
+
+        fclose(fp);
     }
+
 
     while (running) {
         eval(fetch());
