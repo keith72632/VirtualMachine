@@ -7,6 +7,9 @@
 
 #define STACK_SIZE 256
 #define FILE_SIZE 256
+#define FILE_NAME "test.txt"
+
+char file_size = 0;
 
 bool running = true;
 int ip = 0;
@@ -27,6 +30,7 @@ const char program[] = {
 int fetch(void);
 void eval(int instr);
 void print_stack(int stack[]);
+char *file_parse(char *file_name);
 
 
 int main(int argc, char **argv) 
@@ -47,6 +51,11 @@ int main(int argc, char **argv)
 
         fclose(fp);
     }
+    else
+    {
+        printf("Enter file name\n");
+        exit(1);
+    }
 
 
     while (running) {
@@ -54,6 +63,28 @@ int main(int argc, char **argv)
         ip++; // increment the ip every iteration
     }
     print_stack(stack);
+
+    char *fpp = file_parse(file_name);
+    size_t len = strlen(fpp);
+    char temp[7][4];
+    int j = 0, k = 0;
+
+    for(size_t i = 0; i < len; i++)
+    {
+        if(fpp[i] != ' ' && fpp[i] != '\n')
+        {
+            temp[j][k] = fpp[i];
+            putchar(temp[j][k]);
+            printf("  j = %d. k = %d\n", j, k);
+            k++;
+        }
+        else
+        {
+            j++;
+            k = 0;
+        }
+    }
+    puts(temp[0]);
 }
 
 int fetch() 
@@ -116,3 +147,27 @@ void print_stack(int stack[])
     if(SP != 0) printf("\n");
 }
 
+char *file_parse(char *file_name)
+{
+    FILE *fp = NULL;
+    char junk, ch, i = 0;
+    char *return_array = NULL;
+    
+    fp = fopen(file_name, "r");
+
+    while((junk = fgetc(fp))!=EOF && junk){
+        file_size++;
+        return_array = realloc(return_array, (sizeof(char) * file_size));        
+        return_array[i] = junk;
+        i++;
+//            putchar(junk);
+    }
+    putchar('\n');
+
+//    printf("File size = %d\n", file_size);
+
+    fclose(fp);
+
+    return return_array;
+    
+}

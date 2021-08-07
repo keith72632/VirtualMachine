@@ -17,15 +17,11 @@ char *file_parse(char *file_name)
 
     while((junk = fgetc(fp))!=EOF && junk){
         if(!isdigit(junk))
-        {
             file_size++;
             return_array = realloc(return_array, (sizeof(char) * file_size));        
             return_array[i] = junk;
             i++;
-            putchar(junk);
-        }
     }
-    putchar('\n');
 
     printf("File size = %d\n", file_size);
 
@@ -35,11 +31,44 @@ char *file_parse(char *file_name)
     
 }
 
+char **div_into_strings(char *str, char dl)
+{
+
+    int len = strlen(str);
+    
+//    char **temp = (char**)malloc(300 * sizeof(char*));
+    char temp[7][4];
+    int j = 0, k = 0;
+
+    //traverse str
+    for(size_t i = 0; i < len; i++)
+    {
+        if(str[i] != dl && str[i] != '\n')
+        {
+            temp[j][k] = str[i];
+            putchar(temp[j][k]);
+            printf("  j = %d. k = %d\n", j, k);
+            k++;
+        }
+        else
+        {
+            j++;
+            k = 0;
+        }
+    }
+    printf("str len = %d\n", len);
+    return temp;
+
+}
 
 int main()
 {
     char *stuff = file_parse(FILE_NAME);
-    printf("it works\n");
-    puts(stuff);
+
+    char **double_stuff =
+    div_into_strings(stuff, ' '); 
+
+    puts(*double_stuff);
+
     return 0;
 }
