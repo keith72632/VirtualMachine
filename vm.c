@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "vm.h"
 
 
@@ -18,6 +19,7 @@ int sp = -1;
 int stack[STACK_SIZE];
 int registers[NUM_OF_REGISTERS];
 
+//test program without parsing file
 const char program[] = {
     PSH, 5,
     PSH, 6,
@@ -27,10 +29,12 @@ const char program[] = {
 };
 
 /*Prototypes*/
-int fetch(void);
+int fetch(int *program);
 void eval(int instr);
 void print_stack(int stack[]);
 char *file_parse(char *file_name);
+int swap_for_int(char *instr);
+int *construct_program(char **prog);
 
 
 int main(int argc, char **argv) 
@@ -58,12 +62,8 @@ int main(int argc, char **argv)
     }
 
 
-    while (running) {
-        eval(fetch());
-        ip++; // increment the ip every iteration
-    }
-    print_stack(stack);
 
+    //convert file to array of strings
     char *fpp = file_parse(file_name);
     size_t len = strlen(fpp);
     char temp[7][4];
@@ -74,8 +74,6 @@ int main(int argc, char **argv)
         if(fpp[i] != ' ' && fpp[i] != '\n')
         {
             temp[j][k] = fpp[i];
-            putchar(temp[j][k]);
-            printf("  j = %d. k = %d\n", j, k);
             k++;
         }
         else
@@ -84,10 +82,39 @@ int main(int argc, char **argv)
             k = 0;
         }
     }
-    puts(temp[0]);
+
+    
+    //just a visual of array of strings
+    for(size_t i = 0; i < 7; i++)
+    {
+        printf("Instruction %ld = %s with enum: %d\n", i, temp[i], swap_for_int(temp[i]));
+    }
+
+
+    //converts array of strings to array of ints, which can be be run
+    int *prog = malloc(file_size * sizeof(int));
+
+    for(size_t i = 0; i < 7; i++)
+    {
+        prog[i] = swap_for_int(temp[i]);
+    }
+    
+    //visual for array on program ints
+    for(size_t i = 0; i < 7; i++)
+    {
+        printf("Actual program instruction i: %d\n", prog[i]);
+    }
+
+    //program runs
+    while (running) {
+        eval(fetch(prog));
+        ip++; // increment the ip every iteration
+    }
+    print_stack(stack);
+
 }
 
-int fetch() 
+int fetch(int *program) 
 {
     return program[ip];
 }
@@ -150,7 +177,8 @@ void print_stack(int stack[])
 char *file_parse(char *file_name)
 {
     FILE *fp = NULL;
-    char junk, ch, i = 0;
+    char junk;
+    int i = 0;
     char *return_array = NULL;
     
     fp = fopen(file_name, "r");
@@ -170,4 +198,44 @@ char *file_parse(char *file_name)
 
     return return_array;
     
+}
+
+int swap_for_int(char *instr)
+{
+    if(strncmp(instr, "PSH", 3) == 0)
+    {
+        return PSH;
+    }
+    else if(strncmp(instr, "ADD", 3) == 0)
+    {
+        return ADD;
+    }
+    else if(strncmp(instr, "POP", 3) == 0)
+    {
+        return POP;
+    }
+    else if(strncmp(instr, "HLT", 3) == 0)
+    {
+        return HLT;
+    }
+    else if(isdigit(instr[0]))
+    {
+        int x = atoi(instr);
+        return x;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+int *construct_program(char **prog)
+{
+    int *program = malloc(file_size * sizeof(int));
+
+    for(size_t i = 0; i < 7; i++)
+    {
+        program[i] = swap_for_int(prog[i]);
+    }
+    return program;
 }
