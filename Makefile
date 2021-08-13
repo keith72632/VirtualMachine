@@ -1,7 +1,7 @@
 CC = gcc
 SRCS = $(wildcard *.c)
 OBJS = $(SRCS:.c=.o)
-FLAGS = -Wall -Wextra 
+FLAGS = -g -Wall -Wextra 
 
 all: ${OBJS}
 	gcc $^ -o vm
